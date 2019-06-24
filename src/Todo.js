@@ -1,5 +1,7 @@
+
 import React, { useRef } from "react";
 import {useImmerReducer } from "use-immer";
+import uuidv4 from "uuid/v4"
 
 const initialState = [];
 
@@ -7,27 +9,26 @@ const reducer = (draft, action) => {
 
   switch (action.type) {
     case "ADD_ITEM":
-      draft.push(action.payload);
+      draft.push(action.item);
       return;
-    case "clear":
+    case "CLEAR_LIST":
       return initialState;
     default:
-      throw new Error();
+      return draft;
   }
 }
 
 const Todo = () => {
   const inputEl = useRef(null);
   const [state, dispatch] = useImmerReducer(reducer, initialState);
-  console.log('state', state)
   
   const handleSubmit = (e) => {
     e.preventDefault()
-    const todoobj = {
-      text: inputEl.current.value,
-      done: false
+    const newItem = {
+      id: uuidv4(),
+      text: inputEl.current.value
     };
-    dispatch({ type: "ADD_ITEM", payload: todoobj });
+    dispatch({ type: "ADD_ITEM", item: newItem });
 
     inputEl.current.value = "";
     inputEl.current.focus();
@@ -42,7 +43,7 @@ const Todo = () => {
       <header className='App-header'>
         <ul>
           {state.map(todo => {
-            return <li>{todo.text}</li>;
+            return <li key={todo.id}>{todo.text}</li>;
           })}
         </ul>
         <form onSubmit={handleSubmit}>
